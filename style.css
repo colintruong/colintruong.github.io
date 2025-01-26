@@ -1,0 +1,137 @@
+@import url(https://fonts.googleapis.com/css2?family=Alata&display=swap);
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Alata", sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar {
+    width: 500px;
+    height: 425px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background: #FFD1DF;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.title {
+    position: relative;
+    top: -200px;
+    font-size: 50px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.monthYear {
+    text-align: center;
+    font-weight: 600;
+    width: 150px;
+}
+
+.header button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: #FFF;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.day {
+    text-align: center;
+    padding: 10px;
+    color: #000000;
+    font-weight: 500px;
+}
+
+.dates {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 25px;
+}
+
+.date {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+    margin: auto;
+    cursor: pointer;
+    font-weight: 600;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    transition: 0.2s;
+}
+
+.date:hover, .date.active{
+    background-color: #FF5869;
+    color: #FFFFFF;
+}
+
+.date.inactive {
+    color: #d2d2d2;
+}
+
+.date.inactive:hover {
+    color: #FFFFFF;
+}
+
+/* Notepad styles */
+#notepad {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 300px;
+    height: 200px;
+    background-color: #FFD1DF;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    display: none;
+    z-index: 1000;
+}
+
+#notepad.visible {
+    display: block;
+}
+
+textarea {
+    width: 100%;
+    height: 100%;
+    border: none;
+    resize: none;
+    font-family: "Alata", sans-serif;
+    padding: 5px;
+    font-size: 14px;
+    line-height: 1.5;
+}
