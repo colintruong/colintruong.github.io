@@ -4,8 +4,10 @@ const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const notepad = document.getElementById('notepad');
 const notepadTextarea = notepad.querySelector('textarea');
+const markPeriodBtn = document.getElementById('markPeriodBtn'); // New button element
 
 let currentDate = new Date();
+let selectedDate = null;
 
 // Update the calendar display
 const updateCalendar = () => {
@@ -26,24 +28,32 @@ const updateCalendar = () => {
     // Generate the previous month's inactive days
     for (let i = firstDayIndex; i > 0; i--) {
         const prevDate = new Date(currentYear, currentMonth, 0 - i + 1);
-        datesHTML += `<div class="date inactive">${prevDate.getDate()}</div>`;
+        datesHTML += `<div class="date inactive" data-date="${prevDate.toISOString()}">${prevDate.getDate()}</div>`;
     }
 
     // Generate the current month's dates
     for (let i = 1; i <= totalDays; i++) {
         const date = new Date(currentYear, currentMonth, i);
         const activeClass = date.toDateString() === new Date().toDateString() ? 'active' : '';
-        datesHTML += `<div class="date ${activeClass}" data-date="${date.toISOString()}">${i}</div>`;
+        const periodClass = isPeriodStartDate(date) ? 'period' : ''; // Check if period is marked
+        const periodIcon = isPeriodStartDate(date) ? '<i class="fa-solid fa-droplet period-icon"></i>' : ''; // Show blood icon
+        datesHTML += `<div class="date ${activeClass} ${periodClass}" data-date="${date.toISOString()}">${i}${periodIcon}</div>`;
     }
 
     // Generate the next month's inactive days
-    for (let i = 1; i <= 7 - lastDayIndex; i++) {
+    for (let i = 1; i <= 6 - lastDayIndex; i++) {
         const nextDate = new Date(currentYear, currentMonth + 1, i);
-        datesHTML += `<div class="date inactive">${nextDate.getDate()}</div>`;
+        datesHTML += `<div class="date inactive" data-date="${nextDate.toISOString()}">${nextDate.getDate()}</div>`;
     }
 
     // Update the calendar with the generated dates
     datesElement.innerHTML = datesHTML;
+};
+
+// Check if a date is the marked period start
+const isPeriodStartDate = (date) => {
+    const periodStartDate = localStorage.getItem('periodStartDate');
+    return periodStartDate && new Date(periodStartDate).toDateString() === date.toDateString();
 };
 
 // Format date as a string (e.g., "January 16")
@@ -53,6 +63,7 @@ const formatDate = (date) => {
 
 // Open notepad for the clicked date
 const openNotepadForDate = (date) => {
+    selectedDate = date;
     const formattedDate = formatDate(date);
     notepad.classList.remove('hidden');
     notepad.classList.add('visible');
@@ -63,15 +74,25 @@ const openNotepadForDate = (date) => {
 
 // Get notes for a specific date from localStorage
 const getNotesForDate = (date) => {
-    const dateKey = date.toISOString(); // Using full ISO date string as key
+    const dateKey = date.toISOString().split('T')[0]; // Use only the date part as key
     return localStorage.getItem(dateKey) || ''; // Default to empty string if no notes
 };
 
 // Save notes for a specific date to localStorage
-const saveNotesForDate = (date) => {
-    const dateKey = date.toISOString(); // Using full ISO date string as key
-    const notes = notepadTextarea.value;
-    localStorage.setItem(dateKey, notes);
+const saveNotesForDate = () => {
+    if (selectedDate) {
+        const dateKey = selectedDate.toISOString().split('T')[0]; // Use only the date part as key
+        const notes = notepadTextarea.value;
+        localStorage.setItem(dateKey, notes);
+    }
+};
+
+// Mark the selected date as the start of a period and save it
+const markPeriodStart = () => {
+    if (selectedDate) {
+        localStorage.setItem('periodStartDate', selectedDate.toISOString());
+        updateCalendar(); // Re-render the calendar to show the marked date
+    }
 };
 
 // Close notepad when clicking outside
@@ -79,8 +100,7 @@ document.addEventListener('click', (event) => {
     if (!notepad.contains(event.target) && !event.target.closest('.date')) {
         notepad.classList.remove('visible');
         notepad.classList.add('hidden');
-        const selectedDate = new Date(notepadTextarea.placeholder.replace('Notes for ', ''));
-        saveNotesForDate(selectedDate);
+        saveNotesForDate();
     }
 });
 
@@ -103,6 +123,12 @@ datesElement.addEventListener('click', (event) => {
         openNotepadForDate(date);
     }
 });
+
+// Save notes when typing
+notepadTextarea.addEventListener('input', saveNotesForDate);
+
+// Add event listener to the "Mark Period" button
+markPeriodBtn.addEventListener('click', markPeriodStart);
 
 // Initialize the calendar
 updateCalendar();
